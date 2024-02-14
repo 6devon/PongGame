@@ -57,28 +57,62 @@ function love.load()
 end
 
 function love.update(dt)
-    if love.keyboard.isDown('w') then
-        --math.max ensures that paddles won't go above screen frames
-        player1.dy = -PADDLE_SPEED
-    elseif love.keyboard.isDown('s') then
-        player1.dy = PADDLE_SPEED
-    else
-        player1.dy = 0
-    end
+    if  gameState == 'play' then
+        
+        if ball:collides(player1) then
+            ball.dx = -ball.dx *1.04 --if collision is detected, dx is reversed, 4% is added
+            ball.x = player1.x +5 --shift 
+            --keping velocity going in the same direction but randomizing it
+            if ball.dy < 0 then
+                ball.dy = -math.random(10, 150)
+            else
+                ball.dy = math.random(10, 150)
+            end
+        end
 
-    if love.keyboard.isDown('up') then
-        player2.dy = -PADDLE_SPEED
-    elseif love.keyboard.isDown('down') then
-        player2.dy = PADDLE_SPEED
-    else
-        player2.dy = 0
-    end
+        if ball:collides(player2) then
+            ball.dx = -ball.dx *1.04 --if collision is detected, dx is reversed
+            ball.x = player2.x -4 -- minus by width od the ball
 
-    if gameState == 'play' then
-        ball:update(dt)
+            if ball.dy < 0 then
+                ball.dy = -math.random(10, 150)
+            else
+                ball.dy = math.random(10, 150)
+            end
+        end
+        --upper and lower screen detection
+        if ball.y <= 0 then
+            ball.y = 0
+            ball.dy = -ball.dy
+        end
+
+        if ball.y >= VIRTUAL_WINDOW_HEIGHT - 4 then 
+            ball.y = VIRTUAL_WINDOW_HEIGHT - 4
+            ball.dy = -ball.dy
+        end
     end
-    player1:update(dt)
-    player2:update(dt)
+        if love.keyboard.isDown('w') then
+            --math.max ensures that paddles won't go above screen frames
+            player1.dy = -PADDLE_SPEED
+        elseif love.keyboard.isDown('s') then
+            player1.dy = PADDLE_SPEED
+        else
+            player1.dy = 0
+        end
+
+        if love.keyboard.isDown('up') then
+            player2.dy = -PADDLE_SPEED
+        elseif love.keyboard.isDown('down') then
+            player2.dy = PADDLE_SPEED
+        else
+            player2.dy = 0
+        end
+
+        if gameState == 'play' then
+            ball:update(dt)
+        end
+        player1:update(dt)
+        player2:update(dt)
 end
 
 function love.keypressed(key)
